@@ -21,6 +21,7 @@ const port = process.env.PORT || 5000
 var db = require('./app/database');
 
 const bodyParser = require('body-parser');
+const { error } = require('console');
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(bodyParser.json({ limit: '200mb', extended: true }));
 
@@ -51,7 +52,7 @@ app.use(function (req, res, next) {
 
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
-  let data = await db.main();
+  let data = await db.main().catch(console.error);
   // res.render('pages/index', {
   //   data: data
   // })
