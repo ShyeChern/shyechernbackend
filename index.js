@@ -20,6 +20,8 @@ const port = process.env.PORT || 5000
 // db
 var db = require('./app/database');
 
+const axios = require('axios')
+
 const bodyParser = require('body-parser');
 const { error } = require('console');
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
@@ -52,12 +54,39 @@ app.use(function (req, res, next) {
 
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
-  let data = await db.main().catch(console.error);
+  let data = await db.main();
   // res.render('pages/index', {
   //   data: data
   // })
   res.send(data);
   res.end();
+});
+
+app.get('/test', async (req, res) => {
+  axios
+    .get('https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary', {
+      url: '/stock/v2/get-summary',
+      method: 'get',
+      baseUrl: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
+      headers: {
+        'x-rapidapi-key': '81dff25889msh3ec83c5fc9f1ae0p169175jsnc049f001c189',
+        'x-rapidapi-host': '',
+        'useQueryString': true
+      },
+      params: {
+        symbol: 'APPL',
+        region: 'US'
+      },
+    })
+    .then(axiosRes => {
+      console.log(axiosRes.data)
+      res.send(axiosRes.data);
+      res.end();
+    })
+    .catch(error => {
+      console.error(error)
+    })
+
 });
 
 app.listen(port, () => {
