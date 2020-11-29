@@ -62,6 +62,44 @@ app.get('/', async (req, res) => {
   res.end();
 });
 
+app.get('/getHistoricalData', async (req, res) => {
+  let currentDate = new Date();
+  let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 8).getTime() / 1000;
+  let startDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), currentDate.getDate(), 8).getTime() / 1000;
+  let symbol = req.query.symbol;
+  axios
+    .get('https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-historical-data', {
+      url: '/stock/v2/get-historical-data',
+      method: 'get',
+      baseUrl: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
+      headers: {
+        'x-rapidapi-key': '81dff25889msh3ec83c5fc9f1ae0p169175jsnc049f001c189',
+        'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
+        'useQueryString': true
+      },
+      params: {
+        period1: startDate,
+        period2: endDate,
+        symbol: symbol,
+        filter: 'history',
+        frequency: '1mo'
+      },
+    })
+    .then(axiosRes => {
+      if (axiosRes.data == '') {
+        res.send({ status: 'fail', message: 'no result' });
+      } else {
+        res.send({ status: 'success', data: axiosRes.data });
+      }
+
+      res.end();
+    })
+    .catch(error => {
+      console.error(error)
+      console.log(err)
+    })
+});
+
 app.get('/test', async (req, res) => {
   axios
     .get('https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary', {
@@ -86,7 +124,6 @@ app.get('/test', async (req, res) => {
     .catch(error => {
       console.error(error)
     })
-
 });
 
 app.listen(port, () => {
