@@ -36,18 +36,28 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')))
-  .set('views', path.join(__dirname, 'views'))
-  .set('view engine', 'ejs').
-  get('/', async (req, res) => {
-    // res.send('Hello World!');
-    let data = await db.main();
-    res.render('pages/index', {
-      data: data
-    })
-    // res.send(data);
-    res.end();
-  });
+// app.use(express.static(path.join(__dirname, 'public')))
+//   .set('views', path.join(__dirname, 'views'))
+//   .set('view engine', 'ejs').
+//   get('/', async (req, res) => {
+//     // res.send('Hello World!');
+//     let data = await db.main();
+//     // res.render('pages/index', {
+//     //   data: data
+//     // })
+//     res.send(data);
+//     res.end();
+//   });
+
+app.get('/', async (req, res) => {
+  // res.send('Hello World!');
+  let data = await db.main();
+  // res.render('pages/index', {
+  //   data: data
+  // })
+  res.send(data);
+  res.end();
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`)

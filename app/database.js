@@ -12,8 +12,7 @@ module.exports.main = async () => {
 
   const uri = `mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASSWORD}@${process.env.DBURL}/<dbname>?\
                 retryWrites=true&w=majority`;
-  console.log(uri);
-  const client = new MongoClient(uri);
+  const client = new MongoClient(uri, { useUnifiedTopology: true });
 
   try {
     // Connect to the MongoDB cluster
