@@ -8,10 +8,11 @@ module.exports.main = async () => {
    * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
    */
 
-  // mongodb+srv://chern_1997:<password>@shyecherncluster.nvwz2.mongodb.net/<dbname>?retryWrites=true&w=majority
+  // 
 
-  const uri = `mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASSWORD}@${process.env.DBURL}/<dbname>?\
-                retryWrites=true&w=majority`;
+  // const uri = `mongodb+srv://${process.env.DBUSERNAME}:${process.env.DBPASSWORD}@${process.env.DBURL}/<dbname>?\
+  //               retryWrites=true&w=majority`;
+  const uri = `mongodb+srv://chern_1997:<password>@shyecherncluster.nvwz2.mongodb.net/<dbname>?retryWrites=true&w=majority`;
   const client = new MongoClient(uri, { useUnifiedTopology: true });
 
   try {
