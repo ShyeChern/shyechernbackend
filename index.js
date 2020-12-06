@@ -1,23 +1,11 @@
-// const express = require('express')
-// const path = require('path')
-// require('dotenv').config();
-// const PORT = process.env.PORT || 5000
-
-// express()
-//   .use(express.static(path.join(__dirname, 'public')))
-//   .set('views', path.join(__dirname, 'views'))
-//   .set('view engine', 'ejs')
-//   .get('/', (req, res) => res.render('pages/index'))
-//   .listen(PORT, () => console.log(`Listening on ${PORT}`))
-
-
-const express = require('express')
+const express = require('express');
 require('dotenv').config();
 const app = express();
 const path = require('path');
 const port = process.env.PORT || 5000;
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const { v4: uuidv4 } = require('uuid');
 
 // db
 var db = require('./config/database');
@@ -30,11 +18,13 @@ app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(bodyParser.json({ limit: '200mb', extended: true }));
 
 
-app.use(cookieParser());
+app.use(cookieParser('signedbyshyechern'));
+
 app.use(cors({
   origin: true,
   credentials: true,
 }));
+
 // app.use(express.static(path.join(__dirname, 'public')))
 //   .set('views', path.join(__dirname, 'views'))
 //   .set('view engine', 'ejs').
@@ -48,27 +38,38 @@ app.use(cors({
 //     res.end();
 //   });
 
-app.use((req, res, next) => {
-  // maybe try use router?
-  // learn how to do authorization, validate cookie, check timestamp
-  // Set-Cookie: check credentials credentials: 'include'
-  console.log(req.headers, req.cookies, req.signedCookies);
-  // cookieparser if no use rmb uninstall npm
-  res.cookie('cookieName', 'cookieValue', { maxAge: 900000, httpOnly: true, sameSite: 'none', secure: true });
-  const base64Credentials = (req.headers.authorization || '').split(' ')[1] || '';
-  const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':');
+// app.use((req, res, next) => {
 
-  const auth = { username: 'shyechern', password: 'lim123' }
-  console.log(username, password, auth.username, auth.password);
+//   console.log(req.signedCookies['werwer'] === undefined, req.signedCookies['shyechern']);
+//   // console.log(req.signedCookies);
+//   if (req.signedCookies['shyechern'] === undefined) {
+//     // res.redirect('http://localhost:3000/');
+//     res.redirect('/');
+//     return next();
+//   }
+//   const uniqid = uuidv4();
+//   res.cookie('shyechern', uniqid, {
+//     // in milliseconds (1 hour)
+//     maxAge: 60 * 60 * 1000,
+//     httpOnly: false,
+//     sameSite: 'none',
+//     // secure: true,
+//     signed: true
+//   });
 
-  if (username === auth.username && password === auth.password) {
-    return next();
-  } else {
-    res.status(401).send('Authentication required.'); // custom message
-  }
+//   const base64Credentials = (req.headers.authorization || '').split(' ')[1] || '';
+//   const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':');
 
-  // return next();
-});
+//   const auth = { username: 'shyechern', password: 'lim123' }
+
+//   if (username === auth.username && password === auth.password) {
+//     return next();
+//   } else {
+//     res.status(401).send('Authentication required.'); // custom message
+//   }
+
+//   return next();
+// });
 
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
@@ -77,9 +78,9 @@ app.get('/', async (req, res) => {
   //   data: data
   // })
   // res.send(data);
-
-  res.send({ result: true });
-  res.end();
+  res.redirect('https://google.com');
+  // res.send({ result: false });
+  // res.end();
 });
 
 app.get('/getHistoricalData', async (req, res) => {
