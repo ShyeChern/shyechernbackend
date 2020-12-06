@@ -14,11 +14,13 @@
 const express = require('express')
 require('dotenv').config();
 const app = express();
-const path = require('path')
-const port = process.env.PORT || 5000
+const path = require('path');
+const port = process.env.PORT || 5000;
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 // db
-var db = require('./app/database');
+var db = require('./config/database');
 
 const axios = require('axios')
 
@@ -27,18 +29,12 @@ const { error } = require('console');
 app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(bodyParser.json({ limit: '200mb', extended: true }));
 
-app.use(function (req, res, next) {
-  // website
-  res.setHeader('Access-Control-Allow-Origin', '*');
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-with,content-type');
-
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-});
-
+app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 // app.use(express.static(path.join(__dirname, 'public')))
 //   .set('views', path.join(__dirname, 'views'))
 //   .set('view engine', 'ejs').
@@ -52,13 +48,37 @@ app.use(function (req, res, next) {
 //     res.end();
 //   });
 
+app.use((req, res, next) => {
+  // maybe try use router?
+  // learn how to do authorization, validate cookie, check timestamp
+  // Set-Cookie: check credentials credentials: 'include'
+  console.log(req.headers, req.cookies, req.signedCookies);
+  // cookieparser if no use rmb uninstall npm
+  res.cookie('cookieName', 'cookieValue', { maxAge: 900000, httpOnly: true, sameSite: 'none', secure: true });
+  const base64Credentials = (req.headers.authorization || '').split(' ')[1] || '';
+  const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':');
+
+  const auth = { username: 'shyechern', password: 'lim123' }
+  console.log(username, password, auth.username, auth.password);
+
+  if (username === auth.username && password === auth.password) {
+    return next();
+  } else {
+    res.status(401).send('Authentication required.'); // custom message
+  }
+
+  // return next();
+});
+
 app.get('/', async (req, res) => {
   // res.send('Hello World!');
-  let data = await db.main();
+  // let data = await db.main();
   // res.render('pages/index', {
   //   data: data
   // })
-  res.send(data);
+  // res.send(data);
+
+  res.send({ result: true });
   res.end();
 });
 
