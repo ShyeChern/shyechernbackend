@@ -32,7 +32,7 @@ app.use(bodyParser.json({ limit: '200mb', extended: true }));
 
 app.use(cookieParser());
 app.use(cors({
-  origin: '*',
+  origin: true,
   credentials: true,
 }));
 // app.use(express.static(path.join(__dirname, 'public')))
