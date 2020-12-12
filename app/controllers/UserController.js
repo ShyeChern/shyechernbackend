@@ -18,7 +18,7 @@ exports.checkLogin = async (req, res) => {
             maxAge: 60 * 60 * 1000,
             httpOnly: false,
             sameSite: 'none',
-            // secure: true,
+            secure: true,
             signed: true
           });
           res.status(200).send({ result: true, message: 'Login Success', data: result });
@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
               maxAge: 60 * 60 * 1000,
               httpOnly: false,
               sameSite: 'none',
-              // secure: true,
+              secure: true,
               signed: true
             });
             res.status(200).send({ result: true, message: 'Login Success', data: result });
