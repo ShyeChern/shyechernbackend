@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(cookieParser('signedbyshyechern'));
 
 app.use(cors({
-  origin: true,
+  origin: 'https://shyechernfinance.herokuapp.com/',
   credentials: true,
 }));
 
