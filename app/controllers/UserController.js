@@ -10,7 +10,7 @@ const updateCookie = async (res, userId) => {
       maxAge: 60 * 60 * 1000,
       httpOnly: false,
       sameSite: 'none',
-      secure: true,
+      // secure: true,
       signed: true
     });
     return { result: true, userData: result }
@@ -18,14 +18,16 @@ const updateCookie = async (res, userId) => {
     return { result: false, message: err }
   });
 }
-
+// make env and set secure true false
 
 // check login session with cookie, if exist then generate new cookie
 exports.checkLogin = async (req, res) => {
   if (req.signedCookies['shyechern'] === undefined) {
+    console.log('nocookie');
     res.status(404).send({ result: false, message: 'Session expired or not login' })
   } else {
     await userModel.select({ session: req.signedCookies['shyechern'] }).then(result => {
+      console.log(result);
       if (!result) {
         res.status(404).send({ result: false, message: 'Invalid Session' })
       } else {
