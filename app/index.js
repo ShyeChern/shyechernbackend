@@ -2,8 +2,8 @@
 
 const userController = require('./controllers/UserController');
 const authController = require('./controllers/AuthController');
-const stockController = require('./controllers/stockController');
-const marketController = require('./controllers/marketController');
+const stockController = require('./controllers/StockController');
+const marketController = require('./controllers/MarketController');
 const express = require('express');
 const router = express.Router();
 
