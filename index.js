@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-require('./config/database');
+// require('./config/database');
 const config = require('./config/config').getConfig();
 const port = config.PORT;
 
