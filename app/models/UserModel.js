@@ -1,114 +1,117 @@
+const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// object id link to another document
 const userSchema = new Schema({
-    username: {
-        type: String,
-        required: [true, 'Username field is required'],
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: [true, 'Password is required'],
-        select: false
-    },
-    session: {
-        type: String,
-        default: ''
-    },
-    stock: {
-        type: Array,
-        default: []
-    },
-    createdAt: Date,
-    updatedAt: Date
+  username: {
+    type: String,
+    required: [true, 'Username field is required'],
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    select: false
+  },
+  session: {
+    type: String,
+    default: ''
+  },
+  stock: [{
+    type: ObjectId,
+    ref: 'Stock',
+    autopopulate: true,
+  }],
+  role: {
+    type: Number,
+    get: getRole
+  },
+  createdAt: Date,
+  updatedAt: Date
 }, {
-    timestamps: true,
-    toJSON: {
-        virtuals: true,
-        transform: (doc, ret) => {
-            delete ret._id;
-            delete ret.__v;
-        }
-    },
+  timestamps: true,
+  toJSON: {
+    virtuals: true,
+    getters: true
+  },
 });
 
-// userSchema.findById = function (cb) {
-//     return this.model('user').find({ id: this.id }, cb);
-// };
-
-// userSchema.findByUsername = function (cb) {
-//     return this.model('user').find({ id: this.id }, cb);
-// };
-
-const User = mongoose.model('user', userSchema);
-
-exports.insert = (data) => {
-    return new Promise((resolve, reject) => {
-        const user = new User({
-            username: data.username,
-            password: data.password
-        });
-
-        user.validate(function (err) {
-            if (err)
-                reject(err)
-            else {
-                user.save((err, doc) => {
-                    if (err) {
-                        reject(err.name + ': ' + err.message);
-                    } else {
-                        doc = doc.toJSON();
-                        delete doc.password;
-                        resolve(doc);
-                    }
-                });
-            }
-        })
-    });
+function getRole(role) {
+  if (role === 1) {
+    return 'Admin';
+  } else if (role === 2) {
+    return 'User';
+  }
 }
 
-exports.findByUsername = (username) => {
-    return new Promise((resolve, reject) => {
-        User.findOne({ username: username })
-            .select('+password')
-            .exec(function (err, doc) {
-                if (err) {
-                    reject(err.name + ': ' + err.message);
-                } else {
-                    resolve(doc);
-                }
-            })
-    });
+
+userSchema.plugin(require('mongoose-autopopulate'));
+const User = mongoose.model('User', userSchema);
+
+exports.insert = (data) => {
+  return new Promise((resolve, reject) => {
+    const user = new User(data);
+    user.validate((err) => {
+      if (err)
+        reject(err)
+      else {
+        user.save((err, doc) => {
+          if (err) {
+            reject(err.name + ': ' + err.message);
+          } else {
+            doc = doc.toJSON();
+            delete doc.password;
+            resolve(doc);
+          }
+        });
+      }
+    })
+  });
+}
+
+// get user with password
+exports.selectWithPass = (username) => {
+  return new Promise((resolve, reject) => {
+    User.findOne({ username: username })
+      .select('+password')
+      .exec((err, doc) => {
+        if (err) {
+          reject(err.name + ': ' + err.message);
+        } else {
+          resolve(doc);
+        }
+      })
+  });
 };
 
-exports.findBySession = (session) => {
-    return new Promise((resolve, reject) => {
-        User.findOne({ session: session })
-            .exec(function (err, doc) {
-                if (err) {
-                    reject(err.name + ': ' + err.message);
-                } else {
-                    resolve(doc);
-                }
-            })
-    });
-};
 
-exports.updateUser = (id, data) => {
-    return new Promise((resolve, reject) => {
-        User.findOneAndUpdate({ _id: id }, data, { new: true, rawResult: true }, (err, result) => {
-            if (err) {
-                reject(err.name + ': ' + err.message);
-            } else {
-                if (result.lastErrorObject.n > 0) {
-                    resolve(result.value.toJSON());
-                } else {
-                    reject('Fail to update user data');
-                }
+exports.update = (condition, data) => {
+  return new Promise((resolve, reject) => {
+    User.findOneAndUpdate(condition, data, { new: true, rawResult: true }, (err, result) => {
+      if (err) {
+        reject(err.name + ': ' + err.message);
+      } else {
+        if (result.lastErrorObject.n > 0) {
+          resolve(result.value.toJSON());
+        } else {
+          reject('Fail to update user data');
+        }
 
-            }
-        })
-    });
+      }
+    })
+  });
+}
+
+// general get user
+exports.select = (data) => {
+  return new Promise((resolve, reject) => {
+    User.findOne(data)
+      .exec((err, doc) => {
+        if (err) {
+          reject(err.name + ': ' + err.message);
+        } else {
+          resolve(doc);
+        }
+      })
+  });
 }

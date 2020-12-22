@@ -2,10 +2,9 @@ const { Decimal128 } = require('mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const stockSchema = new Schema({
-  name: String,
-  symbol: String,
-  beta: Decimal128,
+const marketSchema = new Schema({
+  marketReturn: Decimal128,
+  riskFree: Decimal128,
   createdAt: Date,
   updatedAt: Date
 }, {
@@ -15,28 +14,28 @@ const stockSchema = new Schema({
   },
 });
 
-const Stock = mongoose.model('Stock', stockSchema);
+const Market = mongoose.model('Market', marketSchema);
 
-exports.upsert = (condition, data) => {
+exports.update = (condition, data) => {
   return new Promise((resolve, reject) => {
-    Stock.findOneAndUpdate(condition, data, { new: true, rawResult: true, upsert: true }, (err, result) => {
+    Market.findOneAndUpdate(condition, data, { new: true, rawResult: true }, (err, result) => {
       if (err) {
         reject(err.name + ': ' + err.message);
       } else {
         if (result.lastErrorObject.n > 0) {
           resolve(result.value.toJSON());
         } else {
-          reject('Fail to insert or update new stock data');
+          reject('Fail to update market data');
         }
+
       }
     })
   });
 }
 
-// general get stock
-exports.select = (data) => {
+exports.select = () => {
   return new Promise((resolve, reject) => {
-    Stock.findOne(data)
+    Market.findOne({})
       .exec((err, doc) => {
         if (err) {
           reject(err.name + ': ' + err.message);
@@ -46,6 +45,4 @@ exports.select = (data) => {
       })
   });
 }
-
-
 
