@@ -10,7 +10,7 @@ const updateCookie = async (res, userId) => {
       maxAge: 60 * 60 * 1000,
       httpOnly: false,
       sameSite: 'none',
-      secure: true,
+      // secure: true,
       signed: true
     });
     return { result: true, userData: result }
