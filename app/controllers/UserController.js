@@ -23,9 +23,9 @@ const updateCookie = async (res, userId) => {
 // check login session with cookie, if exist then generate new cookie
 exports.checkLogin = async (req, res) => {
   if (req.signedCookies['shyechern'] === undefined) {
-    console.log('nocookie');
     res.status(404).send({ result: false, message: 'Session expired or not login' })
   } else {
+    console.log(req.signedCookies['shyechern']);
     await userModel.select({ session: req.signedCookies['shyechern'] }).then(result => {
       console.log(result);
       if (!result) {
