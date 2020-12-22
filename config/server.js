@@ -11,12 +11,12 @@ app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 app.use(cookieParser('signedbyshyechern'));
 
 app.use(cors({
-  origin: 'https://shyechernfinance.herokuapp.com/',
+  origin: true,
   credentials: true,
 }));
 
 app.use((req, res, next) => {
-  
+
   // basic authorization chg to jwt later
   const base64Credentials = (req.headers.authorization || '').split(' ')[1] || '';
   const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':');
