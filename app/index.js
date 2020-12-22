@@ -9,26 +9,26 @@ const router = express.Router();
 
 // session checking middleware
 const sessionChecking = async (req, res, next) => {
-  return next();
-  // await authController.checkSession(req, res).then(result => {
-  //   if (!result) {
-  //     return res.status(401).send({ result: false, message: 'Invalid or no session' });
-  //   } else {
-  //     return next();
-  //   }
-  // });
+  // return next();
+  await authController.checkSession(req, res).then(result => {
+    if (!result) {
+      return res.status(401).send({ result: false, message: 'Invalid or no session' });
+    } else {
+      return next();
+    }
+  });
 }
 
 // session update middleware
 const sessionUpdate = async (req, res, next) => {
-  return next();
-  // await authController.updateSession(req, res).then(result => {
-  //   if (!result) {
-  //     return res.status(500).send({ result: false, message: 'Fail to update session' });
-  //   } else {
-  //     return next();
-  //   }
-  // })
+  // return next();
+  await authController.updateSession(req, res).then(result => {
+    if (!result) {
+      return res.status(500).send({ result: false, message: 'Fail to update session' });
+    } else {
+      return next();
+    }
+  })
 }
 
 /*

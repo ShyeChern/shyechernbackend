@@ -48,7 +48,7 @@ exports.updateSession = async (req, res) => {
           maxAge: 60 * 60 * 1000,
           httpOnly: false,
           sameSite: 'none',
-          // secure: true,
+          secure: true,
           signed: true
         });
         return true;
