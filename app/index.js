@@ -54,11 +54,11 @@ router.post('/user/addUser', (req, res) => {
   userController.addUser(req, res);
 });
 
-router.get('/user/getUser/:userId', [sessionChecking, sessionUpdate], (req, res) => {
+router.get('/user/getUser/:userId', [sessionChecking], (req, res) => {
   userController.getUser(req, res);
 });
 
-router.put('/user/logout/:userId', [sessionChecking, sessionUpdate], (req, res) => {
+router.put('/user/logout/:userId', [sessionChecking], (req, res) => {
   userController.logout(req, res);
 });
 
@@ -85,7 +85,7 @@ router.put('/market/updateRiskFree/:marketId', [sessionChecking, sessionUpdate],
   marketController.updateRiskFree(req, res);
 });
 
-router.get('/market/getMarket/:userId', [sessionChecking, sessionUpdate], (req, res) => {
+router.get('/market/getMarket/:userId', [sessionChecking], (req, res) => {
   marketController.getMarket(req, res);
 });
 
