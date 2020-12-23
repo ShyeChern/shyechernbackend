@@ -6,7 +6,6 @@ const { v4: uuidv4 } = require('uuid');
 const updateCookie = async (res, userId) => {
   return await userModel.update({ _id: userId }, { session: uuidv4() }).then(result => {
     if (process.env.ENVIRONMENT === 'Live') {
-      console.log('live');
       res.cookie('shyechern', result.session, {
         // in milliseconds (1 hour)
         maxAge: 60 * 60 * 1000,
@@ -106,6 +105,18 @@ exports.addUser = async (req, res) => {
       .catch(err => {
         res.status(500).send({ result: false, message: err })
       });
+  }
+}
+
+exports.logout = async (req, res) => {
+  if (req.params.userId === '' || !req.params.userId) {
+    res.status(404).send({ result: false, message: 'Empty user id detected' })
+  } else {
+    await userModel.update({ _id: req.params.userId }, { session: '' }).then(result => {
+      res.status(200).send({ result: true, message: 'success' })
+    }).catch(err => {
+      res.status(500).send({ result: false, message: err })
+    });
   }
 }
 
