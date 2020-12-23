@@ -11,6 +11,7 @@ const router = express.Router();
 const sessionChecking = async (req, res, next) => {
   if (process.env.ENVIRONMENT === 'Live') {
     await authController.checkSession(req, res).then(result => {
+      console.log(result);
       if (!result) {
         return res.status(401).send({ result: false, message: 'Invalid or no session' });
       } else {
@@ -57,7 +58,7 @@ router.get('/user/getUser/:userId', [sessionChecking, sessionUpdate], (req, res)
   userController.getUser(req, res);
 });
 
-router.put('/user/logout/:userId', [], (req, res) => {
+router.put('/user/logout/:userId', [sessionChecking, sessionUpdate], (req, res) => {
   userController.logout(req, res);
 });
 
