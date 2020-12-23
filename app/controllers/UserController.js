@@ -113,7 +113,13 @@ exports.logout = async (req, res) => {
     res.status(404).send({ result: false, message: 'Empty user id detected' })
   } else {
     await userModel.update({ _id: req.params.userId }, { session: '' }).then(result => {
-      res.clearCookie("shyechern");
+      res.cookie('shyechern', result.session, {
+        maxAge: 0,
+        httpOnly: false,
+        sameSite: 'none',
+        secure: true,
+        signed: true
+      });
       res.status(200).send({ result: true, message: 'success' })
     }).catch(err => {
       res.status(500).send({ result: false, message: err })
