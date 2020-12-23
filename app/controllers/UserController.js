@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const updateCookie = async (res, userId) => {
   return await userModel.update({ _id: userId }, { session: uuidv4() }).then(result => {
     if (process.env.ENVIRONMENT === 'Live') {
+      console.log('live');
       res.cookie('shyechern', result.session, {
         // in milliseconds (1 hour)
         maxAge: 60 * 60 * 1000,
