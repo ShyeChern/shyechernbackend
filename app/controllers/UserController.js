@@ -36,6 +36,7 @@ exports.checkLogin = async (req, res) => {
       if (!result) {
         res.status(404).send({ result: false, message: 'Invalid Session' })
       } else {
+        console.log(result);
         updateCookie(res, result._id).then(result => {
           if (!result.result) {
             res.status(500).send({ result: false, message: result.message })

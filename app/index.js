@@ -57,7 +57,7 @@ router.get('/user/getUser/:userId', [sessionChecking, sessionUpdate], (req, res)
   userController.getUser(req, res);
 });
 
-router.put('/user/logout/:userId', (req, res) => {
+router.put('/user/logout/:userId', [], (req, res) => {
   userController.logout(req, res);
 });
 
