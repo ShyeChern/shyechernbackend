@@ -5,14 +5,21 @@ const { v4: uuidv4 } = require('uuid');
 // general function for update cookie
 const updateCookie = async (res, userId) => {
   return await userModel.update({ _id: userId }, { session: uuidv4() }).then(result => {
-    res.cookie('shyechern', result.session, {
-      // in milliseconds (1 hour)
-      maxAge: 60 * 60 * 1000,
-      httpOnly: false,
-      sameSite: 'none',
-      secure: true,
-      signed: true
-    });
+    if (process.env.ENVIRONMENT === 'Live') {
+      res.cookie('shyechern', result.session, {
+        // in milliseconds (1 hour)
+        maxAge: 60 * 60 * 1000,
+        httpOnly: false,
+        sameSite: 'none',
+        secure: true,
+        signed: true
+      });
+    } else if (process.env.ENVIRONMENT === 'Local') {
+      res.cookie('shyechern', result.session, {
+        maxAge: 60 * 60 * 1000,
+        signed: true
+      });
+    }
     return { result: true, userData: result }
   }).catch(err => {
     return { result: false, message: err }
@@ -25,9 +32,7 @@ exports.checkLogin = async (req, res) => {
   if (req.signedCookies['shyechern'] === undefined) {
     res.status(404).send({ result: false, message: 'Session expired or not login' })
   } else {
-    console.log(req.signedCookies['shyechern']);
     await userModel.select({ session: req.signedCookies['shyechern'] }).then(result => {
-      console.log(result);
       if (!result) {
         res.status(404).send({ result: false, message: 'Invalid Session' })
       } else {

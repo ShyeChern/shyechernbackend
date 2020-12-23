@@ -43,15 +43,23 @@ exports.updateSession = async (req, res) => {
       if (!result) {
         return false;
       } else {
-        res.cookie('shyechern', result.session, {
-          // in milliseconds (1 hour)
-          maxAge: 60 * 60 * 1000,
-          httpOnly: false,
-          sameSite: 'none',
-          // secure: true,
-          signed: true
-        });
-        return true;
+        if (process.env.ENVIRONMENT === 'Live') {
+          res.cookie('shyechern', result.session, {
+            maxAge: 60 * 60 * 1000,
+            httpOnly: false,
+            sameSite: 'none',
+            secure: true,
+            signed: true
+          });
+          return true;
+        } else if (process.env.ENVIRONMENT === 'Local') {
+          res.cookie('shyechern', result.session, {
+            maxAge: 60 * 60 * 1000,
+            signed: true
+          });
+          return true;
+        }
+
       }
     })
       .catch(err => {
