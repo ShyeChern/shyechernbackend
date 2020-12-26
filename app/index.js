@@ -11,7 +11,6 @@ const router = express.Router();
 const sessionChecking = async (req, res, next) => {
   if (process.env.ENVIRONMENT === 'Live') {
     await authController.checkSession(req, res).then(result => {
-      console.log(result);
       if (!result) {
         return res.status(401).send({ result: false, message: 'Invalid or no session' });
       } else {

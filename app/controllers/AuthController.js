@@ -20,9 +20,7 @@ exports.checkSession = async (req, res) => {
   if (req.signedCookies['shyechern'] === undefined || !userId || userId === '') {
     return false;
   } else {
-    console.log(userId);
     const exist = await userModel.select({ session: req.signedCookies['shyechern'], _id: userId }).then(result => {
-      console.log(result);
       if (!result) {
         return false
       } else {
