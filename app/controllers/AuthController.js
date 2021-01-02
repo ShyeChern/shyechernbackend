@@ -13,13 +13,13 @@ const getUserId = (req, res) => {
   return userId;
 }
 
-// session checking for middleware
+// web session checking for middleware
 exports.checkSession = async (req, res) => {
   const userId = getUserId(req, res);
   if (req.signedCookies['shyechern'] === undefined || !userId || userId === '') {
     return false;
   } else {
-    const exist = await userModel.select({ session: req.signedCookies['shyechern'], _id: userId }).then(result => {
+    const exist = await userModel.select({ webSession: req.signedCookies['shyechern'], _id: userId }).then(result => {
       if (!result) {
         return false
       } else {
@@ -33,18 +33,19 @@ exports.checkSession = async (req, res) => {
   }
 }
 
-// session update for middleware
+// web session update for middleware
 exports.updateSession = async (req, res) => {
   const userId = getUserId(req, res);
   if (!userId || userId === '') {
     return false;
   } else {
-    const complete = await userModel.update({ _id: userId }, { session: uuidv4() }).then(result => {
+    const complete = await userModel.update({ _id: userId }, { webSession: uuidv4() }).then(result => {
       if (!result) {
         return false;
       } else {
+        // handle mobile
         if (process.env.ENVIRONMENT === 'Live') {
-          res.cookie('shyechern', result.session, {
+          res.cookie('shyechern', result.webSession, {
             maxAge: 60 * 60 * 1000,
             httpOnly: false,
             sameSite: 'none',
@@ -53,7 +54,7 @@ exports.updateSession = async (req, res) => {
           });
           return true;
         } else if (process.env.ENVIRONMENT === 'Local') {
-          res.cookie('shyechern', result.session, {
+          res.cookie('shyechern', result.webSession, {
             maxAge: 60 * 60 * 1000,
             signed: true
           });
@@ -68,3 +69,4 @@ exports.updateSession = async (req, res) => {
     return complete;
   }
 }
+

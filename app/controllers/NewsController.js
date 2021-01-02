@@ -31,7 +31,7 @@ exports.getNewsList = async (req, res) => {
   });
 };
 
-// This method currently no use
+// Currently no use
 exports.getNewsDetail = async (req, res) => {
   await keyModel.select({ type: 'Yahoo Finance', source: 'Rapid Api', status: true }).then(async (result) => {
     await axios.get('https://apidojo-yahoo-finance-v1.p.rapidapi.com/news/v2/get-details', {

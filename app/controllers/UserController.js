@@ -4,9 +4,9 @@ const { v4: uuidv4 } = require('uuid');
 
 // general function for update cookie
 const updateCookie = async (res, userId) => {
-  return await userModel.update({ _id: userId }, { session: uuidv4() }).then(result => {
+  return await userModel.update({ _id: userId }, { webSession: uuidv4() }).then(result => {
     if (process.env.ENVIRONMENT === 'Live') {
-      res.cookie('shyechern', result.session, {
+      res.cookie('shyechern', result.webSession, {
         // in milliseconds (1 hour)
         maxAge: 60 * 60 * 1000,
         httpOnly: false,
@@ -15,7 +15,7 @@ const updateCookie = async (res, userId) => {
         signed: true
       });
     } else if (process.env.ENVIRONMENT === 'Local') {
-      res.cookie('shyechern', result.session, {
+      res.cookie('shyechern', result.webSession, {
         maxAge: 60 * 60 * 1000,
         signed: true
       });
@@ -25,14 +25,13 @@ const updateCookie = async (res, userId) => {
     return { result: false, message: err }
   });
 }
-// make env and set secure true false
 
 // check login session with cookie, if exist then generate new cookie
 exports.checkLogin = async (req, res) => {
   if (req.signedCookies['shyechern'] === undefined) {
     res.status(404).send({ result: false, message: 'Session expired or not login' })
   } else {
-    await userModel.select({ session: req.signedCookies['shyechern'] }).then(result => {
+    await userModel.select({ webSession: req.signedCookies['shyechern'] }).then(result => {
       if (!result) {
         res.status(404).send({ result: false, message: 'Invalid Session' })
       } else {
@@ -112,8 +111,8 @@ exports.logout = async (req, res) => {
   if (req.params.userId === '' || !req.params.userId) {
     res.status(404).send({ result: false, message: 'Empty user id detected' })
   } else {
-    await userModel.update({ _id: req.params.userId }, { session: '' }).then(result => {
-      res.cookie('shyechern', result.session, {
+    await userModel.update({ _id: req.params.userId }, { webSession: '' }).then(result => {
+      res.cookie('shyechern', result.webSession, {
         maxAge: 0,
         httpOnly: false,
         sameSite: 'none',

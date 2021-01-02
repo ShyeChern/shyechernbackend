@@ -13,7 +13,11 @@ const userSchema = new Schema({
     required: [true, 'Password is required'],
     select: false
   },
-  session: {
+  webSession: {
+    type: String,
+    default: ''
+  },
+  mobileAppSession: {
     type: String,
     default: ''
   },
