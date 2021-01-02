@@ -15,7 +15,6 @@ const getUserId = (req, res) => {
 
 // session checking for middleware
 exports.checkSession = async (req, res) => {
-  console.log(req.signedCookies['shyechern']);
   const userId = getUserId(req, res);
   if (req.signedCookies['shyechern'] === undefined || !userId || userId === '') {
     return false;

@@ -17,13 +17,10 @@ app.use(cors({
 
 app.use((req, res, next) => {
 
-  // basic authorization chg to jwt later
   const base64Credentials = (req.headers.authorization || '').split(' ')[1] || '';
   const [username, password] = Buffer.from(base64Credentials, 'base64').toString().split(':');
 
-  const auth = { username: 'shyechern', password: 'lim123' }
-
-  if (username === auth.username && password === auth.password) {
+  if (username === process.env.AUTH_USERNAME && password === process.env.AUTH_PASSWORD + process.env.AUTH_SALT) {
     return next();
   } else {
     res.status(401).send({ result: false, message: 'Fail Authorization' });

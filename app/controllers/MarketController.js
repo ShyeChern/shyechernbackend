@@ -31,16 +31,16 @@ exports.updateMarketReturn = async (req, res) => {
       } else {
         let marketPrices = [];
         axiosRes.data.prices.forEach(value => {
-          value.hasOwnProperty('adjclose') ? marketPrices.push({ date: new Date(value.date * 1000), price: value.adjclose }) : '';
+          value.hasOwnProperty('adjclose') && value.adjclose !== null ? marketPrices.push({ date: new Date(value.date * 1000), price: value.adjclose }) : '';
         });
         marketPrices.sort((a, b) => {
           return a.date - b.date
         });
-
+        console.log(marketPrices);
         let marketReturn = (Math.pow((marketPrices[marketPrices.length - 1].price / marketPrices[0].price), 0.2) - 1).toFixed(4);
 
         await marketModel.update({ _id: req.params.marketId }, { marketReturn: marketReturn }).then(result => {
-          res.status(200).send({ result: true, message: "Update market return success", data: result });
+          res.status(200).send({ result: true, message: "Update market return rate success", data: result });
         }).catch(err => {
           res.status(500).send({ result: false, message: err });
         });
@@ -55,9 +55,8 @@ exports.updateMarketReturn = async (req, res) => {
 };
 
 exports.updateRiskFree = async (req, res) => {
-
   await marketModel.update({ _id: req.params.marketId }, { riskFree: req.body.riskFree }).then(result => {
-    res.status(200).send({ result: true, message: "Update risk free success", data: result });
+    res.status(200).send({ result: true, message: "Update risk free rate success", data: result });
   }).catch(err => {
     res.status(500).send({ result: false, message: err });
   });

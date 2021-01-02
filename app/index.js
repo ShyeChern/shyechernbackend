@@ -4,6 +4,7 @@ const userController = require('./controllers/UserController');
 const authController = require('./controllers/AuthController');
 const stockController = require('./controllers/StockController');
 const marketController = require('./controllers/MarketController');
+const newsController = require('./controllers/NewsController');
 const express = require('express');
 const router = express.Router();
 
@@ -88,5 +89,20 @@ router.get('/market/getMarket/:userId', [sessionChecking], (req, res) => {
   marketController.getMarket(req, res);
 });
 
+/*
+  News Controller
+*/
+router.get('/news/getNewsList/:userId/:symbol', [sessionChecking], (req, res) => {
+  newsController.getNewsList(req, res);
+});
+
+router.get('/news/getNewsDetail/:userId/:uuid', [sessionChecking], (req, res) => {
+  newsController.getNewsDetail(req, res);
+});
+
+router.get('/news/test', [sessionChecking], (req, res) => {
+  console.log(req.headers);
+  res.end();
+});
 
 module.exports = router;

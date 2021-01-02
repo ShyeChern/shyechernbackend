@@ -6,6 +6,7 @@ const stockSchema = new Schema({
   name: String,
   symbol: String,
   beta: Decimal128,
+  actualReturn: Decimal128,
   createdAt: Date,
   updatedAt: Date
 }, {
