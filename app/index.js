@@ -8,10 +8,18 @@ const newsController = require('./controllers/NewsController');
 const express = require('express');
 const router = express.Router();
 
-// session checking middleware
+// session checking middleware for mobile and web
 const sessionChecking = async (req, res, next) => {
-  if (process.env.ENVIRONMENT === 'Live') {
-    await authController.checkSession(req, res).then(result => {
+  if (typeof req.headers['mobile-session'] !== 'undefined') {
+    await authController.checkMobileSession(req, res).then(result => {
+      if (!result) {
+        return res.status(401).send({ result: false, message: 'Invalid or no session' });
+      } else {
+        return next();
+      }
+    });
+  } else if (process.env.ENVIRONMENT === 'Live') {
+    await authController.checkWebSession(req, res).then(result => {
       if (!result) {
         return res.status(401).send({ result: false, message: 'Invalid or no session' });
       } else {
@@ -22,12 +30,21 @@ const sessionChecking = async (req, res, next) => {
     return next();
   }
 
+
 }
 
-// session update middleware
+// session update middleware for mobile and web
 const sessionUpdate = async (req, res, next) => {
-  if (process.env.ENVIRONMENT === 'Live') {
-    await authController.updateSession(req, res).then(result => {
+  if (typeof req.headers['mobile-session'] !== 'undefined') {
+    await authController.updateMobileSession(req, res).then(result => {
+      if (!result) {
+        return res.status(500).send({ result: false, message: 'Fail to update session' });
+      } else {
+        return next();
+      }
+    })
+  } else if (process.env.ENVIRONMENT === 'Live') {
+    await authController.updateWebSession(req, res).then(result => {
       if (!result) {
         return res.status(500).send({ result: false, message: 'Fail to update session' });
       } else {
@@ -50,7 +67,7 @@ router.post('/user/login', (req, res) => {
   userController.login(req, res);
 });
 
-router.post('/user/addUser', (req, res) => {
+router.post('/user/addUser', [sessionChecking, sessionUpdate], (req, res) => {
   userController.addUser(req, res);
 });
 
@@ -102,6 +119,7 @@ router.get('/news/getNewsDetail/:userId/:uuid', [sessionChecking], (req, res) =>
 
 router.get('/news/test', [sessionChecking], (req, res) => {
   console.log(req.headers);
+
   res.end();
 });
 
