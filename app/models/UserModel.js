@@ -100,7 +100,6 @@ exports.update = (condition, data) => {
         } else {
           reject('Fail to update user data');
         }
-
       }
     })
   });

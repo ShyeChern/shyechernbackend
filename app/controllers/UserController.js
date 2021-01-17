@@ -3,27 +3,35 @@ const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 
 // general function for update cookie
-const updateCookie = async (res, userId) => {
-  return await userModel.update({ _id: userId }, { webSession: uuidv4() }).then(result => {
-    if (process.env.ENVIRONMENT === 'Live') {
-      res.cookie('shyechern', result.webSession, {
-        // in milliseconds (1 hour)
-        maxAge: 60 * 60 * 1000,
-        httpOnly: false,
-        sameSite: 'none',
-        secure: true,
-        signed: true
-      });
-    } else if (process.env.ENVIRONMENT === 'Local') {
-      res.cookie('shyechern', result.webSession, {
-        maxAge: 60 * 60 * 1000,
-        signed: true
-      });
-    }
-    return { result: true, userData: result }
-  }).catch(err => {
-    return { result: false, message: err }
-  });
+const updateCookie = async (req, res, userId) => {
+  if (typeof req.headers['mobile-app-session'] !== 'undefined') {
+    return await userModel.update({ _id: userId }, { mobileAppSession: uuidv4() }).then(result => {
+      return { result: true, userData: result }
+    }).catch(err => {
+      return { result: false, message: err }
+    });
+  } else {
+    return await userModel.update({ _id: userId }, { webSession: uuidv4() }).then(result => {
+      if (process.env.ENVIRONMENT === 'Live') {
+        res.cookie('shyechern', result.webSession, {
+          // in milliseconds (1 hour)
+          maxAge: 60 * 60 * 1000,
+          httpOnly: false,
+          sameSite: 'none',
+          secure: true,
+          signed: true
+        });
+      } else if (process.env.ENVIRONMENT === 'Local') {
+        res.cookie('shyechern', result.webSession, {
+          maxAge: 60 * 60 * 1000,
+          signed: true
+        });
+      }
+      return { result: true, userData: result }
+    }).catch(err => {
+      return { result: false, message: err }
+    });
+  }
 }
 
 // check login session with cookie, if exist then generate new cookie
@@ -35,7 +43,7 @@ exports.checkLogin = async (req, res) => {
       if (!result) {
         res.status(404).send({ result: false, message: 'Invalid Session' })
       } else {
-        updateCookie(res, result._id).then(result => {
+        updateCookie(req, res, result._id).then(result => {
           if (!result.result) {
             res.status(500).send({ result: false, message: result.message })
           } else {
@@ -49,6 +57,27 @@ exports.checkLogin = async (req, res) => {
       .catch(err => {
         res.status(500).send({ result: false, message: err });
       });
+  }
+}
+
+// check mobile login session, if match generate new session
+exports.checkUpdateMobileAppSession = async (req, res) => {
+  if (req.headers['mobile-app-session'] === undefined || req.body.userId === '' || !req.body.userId) {
+    res.status(404).send({ result: false, message: 'Empty mobile session or user id detected' })
+  } else {
+    await userModel.select({ mobileAppSession: req.headers['mobile-app-session'], _id: req.body.userId }).then(async (result) => {
+      if (!result) {
+        res.status(404).send({ result: false, message: 'No session found' })
+      } else {
+        await userModel.update({ _id: req.body.userId }, { mobileAppSession: uuidv4() }).then(result => {
+          res.status(200).send({ result: true, message: 'Session exist', data: result })
+        }).catch(err => {
+          res.status(500).send({ result: false, message: err });
+        });
+      }
+    }).catch(err => {
+      res.status(500).send({ result: false, message: err });
+    });
   }
 }
 
@@ -67,7 +96,7 @@ exports.login = async (req, res) => {
         if (encryptedPassword !== key) {
           res.status(401).send({ result: false, message: 'Invalid username or password' });
         } else {
-          updateCookie(res, result._id).then(result => {
+          updateCookie(req, res, result._id).then(result => {
             if (!result.result) {
               res.status(500).send({ result: false, message: result.message })
             } else {
@@ -76,7 +105,6 @@ exports.login = async (req, res) => {
           }).catch(err => {
             res.status(500).send({ result: false, message: err })
           });
-
         }
       }
     }).catch(err => {

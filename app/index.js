@@ -8,10 +8,10 @@ const newsController = require('./controllers/NewsController');
 const express = require('express');
 const router = express.Router();
 
-// session checking middleware for mobile and web
+// session checking middleware for mobile first then follow by web
 const sessionChecking = async (req, res, next) => {
-  if (typeof req.headers['mobile-session'] !== 'undefined') {
-    await authController.checkMobileSession(req, res).then(result => {
+  if (typeof req.headers['mobile-app-session'] !== 'undefined') {
+    await authController.checkMobileAppSession(req, res).then(result => {
       if (!result) {
         return res.status(401).send({ result: false, message: 'Invalid or no session' });
       } else {
@@ -29,20 +29,12 @@ const sessionChecking = async (req, res, next) => {
   } else if (process.env.ENVIRONMENT === 'Local') {
     return next();
   }
-
-
 }
 
-// session update middleware for mobile and web
+// session update middleware for mobile first then follow by web
 const sessionUpdate = async (req, res, next) => {
-  if (typeof req.headers['mobile-session'] !== 'undefined') {
-    await authController.updateMobileSession(req, res).then(result => {
-      if (!result) {
-        return res.status(500).send({ result: false, message: 'Fail to update session' });
-      } else {
-        return next();
-      }
-    })
+  if (typeof req.headers['mobile-app-session'] !== 'undefined') {
+    return next();
   } else if (process.env.ENVIRONMENT === 'Live') {
     await authController.updateWebSession(req, res).then(result => {
       if (!result) {
@@ -61,6 +53,10 @@ const sessionUpdate = async (req, res, next) => {
 */
 router.get('/user/checkLogin', (req, res) => {
   userController.checkLogin(req, res);
+});
+
+router.post('/user/checkUpdateMobileAppSession', (req, res) => {
+  userController.checkUpdateMobileAppSession(req, res);
 });
 
 router.post('/user/login', (req, res) => {
@@ -115,12 +111,6 @@ router.get('/news/getNewsList/:userId/:symbol', [sessionChecking], (req, res) =>
 
 router.get('/news/getNewsDetail/:userId/:uuid', [sessionChecking], (req, res) => {
   newsController.getNewsDetail(req, res);
-});
-
-router.get('/news/test', [sessionChecking], (req, res) => {
-  console.log(req.headers);
-
-  res.end();
 });
 
 module.exports = router;

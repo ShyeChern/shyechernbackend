@@ -60,7 +60,6 @@ exports.updateWebSession = async (req, res) => {
           });
           return true;
         }
-
       }
     })
       .catch(err => {
@@ -71,14 +70,12 @@ exports.updateWebSession = async (req, res) => {
 }
 
 // mobile session checking for middleware
-exports.checkMobileSession = async (req, res) => {
-  console.log('ok');
-  return true;
+exports.checkMobileAppSession = async (req, res) => {
   const userId = getUserId(req, res);
-  if (req.signedCookies['shyechern'] === undefined || !userId || userId === '') {
+  if (!userId || userId === '') {
     return false;
   } else {
-    const exist = await userModel.select({ webSession: req.signedCookies['shyechern'], _id: userId }).then(result => {
+    const exist = await userModel.select({ mobileAppSession: req.headers['mobile-app-session'], _id: userId }).then(result => {
       if (!result) {
         return false
       } else {
@@ -91,43 +88,3 @@ exports.checkMobileSession = async (req, res) => {
     return exist;
   }
 }
-
-// mobile session update for middleware
-exports.updateMobileSession = async (req, res) => {
-  console.log('veryok');
-  return false;
-  const userId = getUserId(req, res);
-  if (!userId || userId === '') {
-    return false;
-  } else {
-    const complete = await userModel.update({ _id: userId }, { webSession: uuidv4() }).then(result => {
-      if (!result) {
-        return false;
-      } else {
-        // handle mobile
-        if (process.env.ENVIRONMENT === 'Live') {
-          res.cookie('shyechern', result.webSession, {
-            maxAge: 60 * 60 * 1000,
-            httpOnly: false,
-            sameSite: 'none',
-            secure: true,
-            signed: true
-          });
-          return true;
-        } else if (process.env.ENVIRONMENT === 'Local') {
-          res.cookie('shyechern', result.webSession, {
-            maxAge: 60 * 60 * 1000,
-            signed: true
-          });
-          return true;
-        }
-
-      }
-    })
-      .catch(err => {
-        return false
-      });
-    return complete;
-  }
-}
-
