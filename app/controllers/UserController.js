@@ -115,8 +115,11 @@ exports.login = async (req, res) => {
 
 // add new user
 exports.addUser = async (req, res) => {
-  if (!req.body.username || req.body.username === "" || !req.body.password || req.body.password === "") {
+  if (!req.body.username || req.body.username === "" || !req.body.password || req.body.password === ""
+    || !req.body.confirmPassword || req.body.confirmPassword === "") {
     res.status(404).send({ result: false, message: 'Please fill in username and passowrd' });
+  } else if (req.body.password != req.body.confirmPassword) {
+    res.status(400).send({ result: false, message: 'Password does not matched' });
   } else {
     let salt = crypto.randomBytes(16).toString('base64');
     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
