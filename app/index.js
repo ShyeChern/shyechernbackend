@@ -63,6 +63,10 @@ router.post('/user/login', (req, res) => {
   userController.login(req, res);
 });
 
+router.post('/user/signUp', (req, res) => {
+  userController.addUser(req, res);
+});
+
 router.post('/user/addUser', [sessionChecking, sessionUpdate], (req, res) => {
   userController.addUser(req, res);
 });
