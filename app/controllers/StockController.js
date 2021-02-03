@@ -134,6 +134,15 @@ exports.getStock = async (req, res) => {
   });
 };
 
+// get all the stock available in the db
+exports.getSampleStock = async (req, res) => {
+  await stockModel.selectAll({}).then(async (result) => {
+    res.status(200).send({ result: true, message: 'Get sample stock success', data: result });
+  }).catch(err => {
+    res.status(500).send({ result: false, message: err })
+  });
+};
+
 //use pull to take out mongoose stock
 exports.deleteStock = async (req, res) => {
   await userModel.update({ _id: req.params.userId }, { $pull: { stock: req.body.stockId } }).then((result) => {

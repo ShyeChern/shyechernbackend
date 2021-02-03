@@ -86,6 +86,10 @@ router.put('/stock/getStock/:userId', [sessionChecking, sessionUpdate], (req, re
   stockController.getStock(req, res);
 });
 
+router.get('/stock/getSampleStock/:userId', [sessionChecking], (req, res) => {
+  stockController.getSampleStock(req, res);
+});
+
 router.put('/stock/deleteStock/:userId', [sessionChecking, sessionUpdate], (req, res) => {
   stockController.deleteStock(req, res);
 });

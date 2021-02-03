@@ -48,5 +48,20 @@ exports.select = (data) => {
   });
 }
 
+// general get all stock
+exports.selectAll = (data) => {
+  return new Promise((resolve, reject) => {
+    Stock.find(data)
+      .sort({ symbol: 1 })
+      .exec((err, doc) => {
+        if (err) {
+          reject(err.name + ': ' + err.message);
+        } else {
+          resolve(doc);
+        }
+      })
+  });
+}
+
 
 
