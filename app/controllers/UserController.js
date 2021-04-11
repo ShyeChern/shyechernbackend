@@ -142,18 +142,26 @@ exports.logout = async (req, res) => {
   if (req.params.userId === '' || !req.params.userId) {
     res.status(404).send({ result: false, message: 'Empty user id detected' })
   } else {
-    await userModel.update({ _id: req.params.userId }, { webSession: '' }).then(result => {
-      res.cookie('shyechern', result.webSession, {
-        maxAge: 0,
-        httpOnly: false,
-        sameSite: 'none',
-        secure: true,
-        signed: true
+    if (typeof req.headers['mobile-app-session'] !== 'undefined') {
+      await userModel.update({ _id: req.params.userId }, { mobileAppSession: '' }).then(result => {
+        res.status(200).send({ result: true, message: 'Logout successfully' })
+      }).catch(err => {
+        res.status(500).send({ result: false, message: err })
       });
-      res.status(200).send({ result: true, message: 'success' })
-    }).catch(err => {
-      res.status(500).send({ result: false, message: err })
-    });
+    } else {
+      await userModel.update({ _id: req.params.userId }, { webSession: '' }).then(result => {
+        res.cookie('shyechern', result.webSession, {
+          maxAge: 0,
+          httpOnly: false,
+          sameSite: 'none',
+          secure: true,
+          signed: true
+        });
+        res.status(200).send({ result: true, message: 'Logout successfully' })
+      }).catch(err => {
+        res.status(500).send({ result: false, message: err })
+      });
+    }
   }
 }
 
