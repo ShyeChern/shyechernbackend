@@ -73,10 +73,11 @@ const updateStockSummary = async (req, res) => {
           let condition = {
             symbol: axiosRes.data.quoteType.symbol
           };
+
           let data = {
             name: axiosRes.data.quoteType.shortName,
             symbol: axiosRes.data.quoteType.symbol,
-            beta: axiosRes.data.defaultKeyStatistics.beta.fmt, // probably need to handle undefined fmt? need more test
+            beta: axiosRes.data.defaultKeyStatistics.beta ? axiosRes.data.defaultKeyStatistics.beta.fmt : 0, // probably need to handle undefined fmt? need more test
             actualReturn: actualReturn
           };
           await stockModel.upsert(condition, data).then(result => {
@@ -92,6 +93,7 @@ const updateStockSummary = async (req, res) => {
       reject(err)
     });
   }).catch(err => {
+    console.log(err);
     reject(err)
   });
 }
@@ -113,6 +115,7 @@ exports.getStock = async (req, res) => {
       await updateStockSummary(req, res).then(result => {
         updateUserStock(req, res, { stockId: result._id });
       }).catch(err => {
+        console.log(err);
         res.status(500).send({ result: false, message: err })
       });
     } else {
