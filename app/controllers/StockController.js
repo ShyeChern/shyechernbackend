@@ -93,7 +93,6 @@ const updateStockSummary = async (req, res) => {
       reject(err)
     });
   }).catch(err => {
-    console.log(err);
     reject(err)
   });
 }
@@ -115,7 +114,6 @@ exports.getStock = async (req, res) => {
       await updateStockSummary(req, res).then(result => {
         updateUserStock(req, res, { stockId: result._id });
       }).catch(err => {
-        console.log(err);
         res.status(500).send({ result: false, message: err })
       });
     } else {
