@@ -1,4 +1,4 @@
-# Shye Chern Finance (NodeJS)
+# Shye Chern Finance (NodeJS) (Abandoned)
 
 An investment website and application backend.
 
